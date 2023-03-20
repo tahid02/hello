@@ -81,7 +81,6 @@ export function Page(props: {
       "promptPreset",
       JSON.stringify([
         { value: "You are an expert Accountant.", label: "Accountant" },
-        { value: "You are an expert Engineer.", label: "Engineer" },
         { value: "You are an expert Doc.", label: "Doctor" },
       ])
     );
@@ -94,28 +93,37 @@ export function Page(props: {
     <SpotlightProvider {...spotlightProps}>
       <Container>
         <Sidebar />
-        <Main key={props.id}>
+        <Main key={props.id} style={{ position: "relative" }}>
           <Header
             share={props.headerProps?.share}
             canShare={props.headerProps?.canShare}
             title={props.headerProps?.title}
             onShare={props.headerProps?.onShare}
           />
-          <Select
-            placeholder="Pick one"
-            defaultValue={data[0].value}
-            onChange={(val) => {
-              setValue(val);
-              //@ts-ignore
-              let label = data.filter(({ value, label }) => value === val);
-              localStorage.setItem(
-                "currentPromptPreset",
-                JSON.stringify(label)
-              );
-              dispatch(setTab("options"));
-            }}
-            data={data}
-          />
+          {sessionStorage.getItem("admin") === "true" && (
+            <Select
+              style={{
+                position: "absolute",
+                top: "4rem",
+                left: ".5rem",
+                zIndex: "100",
+              }}
+              placeholder="Pick one"
+              // defaultValue={data[0].value}
+              onChange={(val) => {
+                setValue(val);
+                //@ts-ignore
+                let label = data.filter(({ value, label }) => value === val);
+                localStorage.setItem(
+                  "currentPromptPreset",
+                  JSON.stringify(label)
+                );
+                dispatch(setTab("options"));
+              }}
+              data={data}
+            />
+          )}
+
           {props.showSubHeader && <SubHeader />}
           {props.children}
           <MessageInput key={localStorage.getItem("openai-api-key")} />

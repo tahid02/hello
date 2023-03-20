@@ -46,7 +46,7 @@
   },
   "scripts": {
     "start": "set PORT=3010 && craco start",
-    "build": "GENERATE_SOURCEMAP=false craco build",
+    "build": "craco build --env GENERATE_SOURCEMAP=false",
     "test": "craco test",
     "eject": "craco eject",
     "extract": "formatjs extract 'src/**/*.ts*' --ignore='**/*.d.ts' --out-file public/lang/en-us.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'"

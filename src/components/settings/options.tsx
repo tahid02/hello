@@ -17,6 +17,8 @@ import {
 import { selectSettingsOption } from "../../store/settings-ui";
 import { FormattedMessage, useIntl } from "react-intl";
 import { selectMessagesToSendSafely } from "../../tokenizer";
+import AddPreset from "./addPreset";
+import DeletePreset from "./deletePreset";
 
 export default function GenerationOptionsTab(props: any) {
   const intl = useIntl();
@@ -28,6 +30,9 @@ export default function GenerationOptionsTab(props: any) {
 
   const dispatch = useAppDispatch();
   ///////////////////////////
+  const [showAdd, setShowAdd] = useState(false);
+  const [showRemove, setShowRemove] = useState(false);
+  const [showInputPrompt, setShowInputPromp] = useState(true);
   //@ts-ignore
   let data = JSON.parse(localStorage.getItem("promptPreset")) || [];
   console.log(data);
@@ -35,7 +40,7 @@ export default function GenerationOptionsTab(props: any) {
   let currentPr = JSON.parse(localStorage.getItem("currentPromptPreset"));
   let cpv = "";
   data.map(({ value, label }) => {
-    if (label === currentPr[0].label) {
+    if (label === currentPr?.[0]?.label) {
       cpv = value;
     }
   });
@@ -85,46 +90,96 @@ export default function GenerationOptionsTab(props: any) {
   console.log({ currentPr });
   const systemPromptOption = useMemo(
     () => (
-      <SettingsOption
-        heading={intl.formatMessage({
-          defaultMessage: "System Prompt",
-          description:
-            "Heading for the setting that lets users customize the System Prompt, on the settings screen",
-        })}
-        focused={option === "system-prompt"}
-      >
-        <Textarea
-          value={textVal}
-          onChange={(e) => {
-            setTextVal(e.target.value);
-            onSystemPromptChange(e);
-          }}
-          minRows={5}
-          maxRows={10}
-          autosize
-        />
-        <button onClick={updatePreset}>save</button>
-        <p style={{ marginBottom: "0.7rem" }}>
-          <FormattedMessage
-            defaultMessage="The System Prompt is shown to ChatGPT by the &quot;System&quot; before your first message. The <code>'{{ datetime }}'</code> tag is automatically replaced by the current date and time."
-            values={{
-              code: (chunk) => (
-                <code style={{ whiteSpace: "nowrap" }}>{chunk}</code>
-              ),
+      <>
+        <div style={{ padding: "0.618rem" }}>
+          <div style={{ marginBottom: ".5rem" }}>
+            <Button
+              compact
+              variant="light"
+              onClick={() => {
+                setShowAdd(!showAdd);
+              }}
+              style={{ fontSize: "12px" }}
+            >
+              <small>Add Prompt</small>
+            </Button>
+
+            <Button
+              compact
+              variant="light"
+              style={{
+                backgroundColor: "#b42929",
+                marginLeft: ".5rem",
+                fontSize: "12px",
+              }}
+              onClick={() => {
+                setShowRemove(!showRemove);
+              }}
+            >
+              <small> Delete Prompt</small>
+            </Button>
+          </div>
+          {showAdd && <AddPreset />}
+          {showRemove && <DeletePreset />}
+        </div>
+        <SettingsOption
+          heading={intl.formatMessage({
+            defaultMessage: "System Prompt",
+            description:
+              "Heading for the setting that lets users customize the System Prompt, on the settings screen",
+          })}
+          focused={option === "system-prompt"}
+        >
+          <Textarea
+            value={textVal}
+            onChange={(e) => {
+              setTextVal(e.target.value);
+              onSystemPromptChange(e);
             }}
+            minRows={5}
+            maxRows={10}
+            autosize
           />
-        </p>
-        {resettableSystemPromopt && (
-          <Button
-            size="xs"
-            compact
-            variant="light"
-            onClick={onResetSystemPrompt}
+          {/* <button onClick={updatePreset}>save</button> */}
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              margin: "1rem 0",
+            }}
           >
-            <FormattedMessage defaultMessage="Reset to default" />
-          </Button>
-        )}
-      </SettingsOption>
+            {" "}
+            <Button
+              variant="light"
+              onClick={updatePreset}
+              style={{ fontSize: ".9rem" }}
+            >
+              Update Prompt
+            </Button>
+          </div>
+          <p style={{ marginBottom: "0.7rem" }}>
+            <FormattedMessage
+              defaultMessage="The System Prompt is shown to ChatGPT by the &quot;System&quot; before your first message. The <code>'{{ datetime }}'</code> tag is automatically replaced by the current date and time."
+              values={{
+                code: (chunk) => (
+                  <code style={{ whiteSpace: "nowrap" }}>{chunk}</code>
+                ),
+              }}
+            />
+          </p>
+          {resettableSystemPromopt && (
+            <Button
+              size="xs"
+              compact
+              variant="light"
+              onClick={onResetSystemPrompt}
+            >
+              <FormattedMessage defaultMessage="Reset to default" />
+            </Button>
+          )}
+        </SettingsOption>{" "}
+      </>
     ),
     [
       option,
@@ -132,6 +187,9 @@ export default function GenerationOptionsTab(props: any) {
       resettableSystemPromopt,
       onSystemPromptChange,
       onResetSystemPrompt,
+      showAdd,
+      showRemove,
+      showInputPrompt,
     ]
   );
 
